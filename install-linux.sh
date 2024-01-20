@@ -1,6 +1,8 @@
 #!/bin/sh
 
-CURRENT_VERSION=0.1.0
+CURRENT_VERSION=0.1.1
+
+./build.sh # build
 
 tar -xf dist/treepy-$CURRENT_VERSION.tar.gz -C /tmp
 echo "Unpacked into /tmp/treepy-$CURRENT_VERSION"
