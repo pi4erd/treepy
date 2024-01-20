@@ -41,7 +41,6 @@ if __name__ == "__main__":
                         help="ignore files, show only dirs")
     
     args = parser.parse_args()
-    print(args)
     
     if args.path is None:
         realpath = Path.cwd()
