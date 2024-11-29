@@ -1,11 +1,25 @@
 #!/usr/bin/env python3
 
+import importlib.metadata
+import importlib
+import git
 from sys import argv
 from pathlib import Path
 from argparse import ArgumentParser
 from colorama import Fore, Style
 
-def print_item(item: Path, print_file: bool=True, depth: int=0, maxdepth: int=-1):
+def print_item(
+    item: Path,
+    ignore_wildcard: list[str]=[],
+    print_file: bool=True,
+    depth: int=0,
+    maxdepth: int=-1
+    ):
+    for filename in ignore_wildcard:
+        file_to_ignore = Path(filename)
+        if file_to_ignore.name == item.name and depth > 0:
+            return
+    
     is_dir = item.is_dir()
     
     color = Fore.WHITE
@@ -25,32 +39,52 @@ def print_item(item: Path, print_file: bool=True, depth: int=0, maxdepth: int=-1
         return
     
     for i in item.iterdir():
-        print_item(i, print_file, depth + 1, maxdepth)
+        print_item(i, ignore_wildcard, print_file, depth + 1, maxdepth)
 
 if __name__ == "__main__":
+    version = "unknown"
+    try:
+        package = "treepy"
+        version = importlib.metadata.version(package)
+    except importlib.metadata.PackageNotFoundError:
+        try:
+            repo = git.Repo(search_parent_directories=True)
+            sha = repo.head.object.hexsha
+            branch = repo.active_branch.name
+            version = "git." + branch + "." + sha
+        except git.InvalidGitRepositoryError:
+            pass
+    
     parser = ArgumentParser(
         prog=argv[0], # so that it can be renamed whatever
         description="Prints a tree of files/directories",
         epilog="In development"
     )
     parser.add_argument("path", nargs='?')
+    parser.add_argument("-i", "--ignore", action='extend', nargs='*',
+                        help="ignores files specified by bash wildcard")
+    parser.add_argument("--version", action='version', version=f"%(prog)s {version}")
     parser.add_argument("-d", "--depth", action="store", 
                         default=-1, type=int, metavar="DEPTH",
                         help="the depth to look for")
-    parser.add_argument("-i", "--ignore-file", action="store_true",
-                        help="ignore files, show only dirs")
     
     args = parser.parse_args()
     
     if args.path is None:
         realpath = Path.cwd()
     else:
-        realpath = Path(args.path)
+        if args.path == '.':
+            realpath = Path.cwd()
+        else:
+            realpath = Path(args.path)
+
+    ignore_wdc = [] if args.ignore is None else [wildcards for wildcards in args.ignore]
     
     try:
         print_item(
             realpath,
-            print_file=not args.ignore_file,
+            ignore_wildcard=ignore_wdc,
+            print_file=True,
             depth=0,
             maxdepth=args.depth
         )

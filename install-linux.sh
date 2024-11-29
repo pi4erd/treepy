@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CURRENT_VERSION=0.1.1
+CURRENT_VERSION=0.1.2
 
 ./build.sh # build
 

@@ -1,15 +1,22 @@
 [build-system]
-requires = ["hatchling", "argparse", "colorama"]
+requires = ["hatchling", "argparse", "colorama", "gitpython"]
 build-backend = "hatchling.build"
 
 [project]
 name = "treepy"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
     { name = "pi4erd", email = "piuuttri@gmail.com" }
 ]
 description = "A tree program in python"
 requires-python = ">=3.7"
+
+[tool.poetry]
+name = "treepy"
+version = "0.1.2"
+package-mode = true
+description = "Treepy package"
+authors = ["pi4erd"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tree.py"]
